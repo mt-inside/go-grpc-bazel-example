@@ -21,7 +21,7 @@ load("@io_bazel_rules_go//go:deps.bzl", "go_rules_dependencies", "go_register_to
 
 go_rules_dependencies()  # Dependencies for the toolchain and the rules' code itself
 
-go_register_toolchains()  # Install a Golang toolchain into the sandbox
+go_register_toolchains(nogo="@//:my_nogo")  # Install a Golang toolchain into the sandbox
 
 
 # == Gazelle ==
