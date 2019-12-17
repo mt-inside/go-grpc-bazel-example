@@ -1,0 +1,4 @@
+load("@bazel_gazelle//:def.bzl", "gazelle")
+
+# gazelle:prefix github.com/mt-inside/go-grpc-bazel-example
+gazelle(name = "gazelle")  # Makes a target here (the root), so that we can run gazelle (as //:gazelle)
