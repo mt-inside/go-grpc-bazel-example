@@ -6,7 +6,7 @@ func TestGenerateReply(t *testing.T) {
 	var want string
 
 	want = "Hello matt"
-	if got := generateReply("mat"); got != want {
+	if got := generateReply("matt"); got != want {
 		t.Errorf("Hello() = %q, want %q", got, want)
 	}
 
