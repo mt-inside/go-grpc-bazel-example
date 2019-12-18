@@ -17,6 +17,8 @@ type Client struct {
 }
 
 func NewClient(log *zap.SugaredLogger, address string) *Client {
+	log.Debugf("Connecting to to %v...", address)
+
 	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		log.Fatalf("could not connect: %v", err)
