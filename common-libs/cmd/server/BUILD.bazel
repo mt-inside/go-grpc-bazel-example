@@ -8,12 +8,14 @@ go_library(
     deps = [
         "//pkg/common:go_default_library",
         "//pkg/server:go_default_library",
+        "@org_uber_go_config//:go_default_library",
         "@org_uber_go_zap//:go_default_library",
     ],
 )
 
 go_binary(
     name = "server",
+    data = ["config/config.yaml"],
     embed = [":go_default_library"],
     visibility = ["//visibility:public"],
 )

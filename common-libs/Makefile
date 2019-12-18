@@ -15,6 +15,6 @@ test:
 	bazel test --test_output=errors //...
 
 run-server: build
-	bazel run //cmd/server
+	bazel run //cmd/server "cmd/server/config/config.yaml"
 run-client: build
 	bazel run //cmd/client -- $(filter-out $@, $(MAKECMDGOALS))
