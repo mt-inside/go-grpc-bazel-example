@@ -5,7 +5,11 @@ go_library(
     srcs = ["main.go"],
     importpath = "github.com/mt-inside/go-grpc-bazel-example/cmd/client",
     visibility = ["//visibility:private"],
-    deps = ["//pkg/client:go_default_library"],
+    deps = [
+        "//pkg/client:go_default_library",
+        "//pkg/common:go_default_library",
+        "@com_github_jawher_mow_cli//:go_default_library",
+    ],
 )
 
 go_binary(
