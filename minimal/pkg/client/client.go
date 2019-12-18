@@ -41,9 +41,3 @@ func (c Client) GetGreeting(name string) string {
 func (c Client) Close() {
 	c.conn.Close()
 }
-
-// write up: optional args:
-// - nils
-// - variadic (if they're all the same type)
-// - params struct (if you don't specify some when making the struct they get the zero value. If that's not OK, have a new() func for the struct that supplies other defaults)
-// - functional options

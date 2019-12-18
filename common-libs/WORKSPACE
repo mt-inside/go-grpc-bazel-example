@@ -3,7 +3,6 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
-
 # == Golang ==
 
 # Load the rules' repo
@@ -21,8 +20,7 @@ load("@io_bazel_rules_go//go:deps.bzl", "go_rules_dependencies", "go_register_to
 
 go_rules_dependencies()  # Dependencies for the toolchain and the rules' code itself
 
-go_register_toolchains(nogo="@//:my_nogo")  # Install a Golang toolchain into the sandbox
-
+go_register_toolchains(nogo = "@//:my_nogo")  # Install a Golang toolchain into the sandbox
 
 # == Gazelle ==
 
@@ -41,7 +39,6 @@ load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies", "go_repository")  # we
 
 gazelle_dependencies()  # Deps for the gazelle rules
 
-
 # == Proto ==
 
 # Repo
@@ -58,7 +55,6 @@ load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
 
 protobuf_deps()  # Deps for the protobuf compilation rules
 # - NB: this ^^ is just the deps. There isn't an "execution" step because we don't install a toolchain or anything, there's just rules (and their deps) available to load and run from BUILD files.
-
 
 # == gRPC ==
 
