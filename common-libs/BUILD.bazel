@@ -1,0 +1,16 @@
+# == Gazelle ==
+
+load("@bazel_gazelle//:def.bzl", "gazelle")
+
+# gazelle:prefix github.com/mt-inside/go-grpc-bazel-example
+gazelle(name = "gazelle")  # Makes a target here (the root), so that we can run gazelle (as //:gazelle)
+
+# == nogo ==
+
+load("@io_bazel_rules_go//go:def.bzl", "nogo")
+
+nogo(
+    name = "my_nogo",
+    vet = True,
+    visibility = ["//visibility:public"],
+)
