@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"runtime"
+	"time"
 
 	"github.com/mt-inside/go-grpc-bazel-example/pkg/common"
 	"github.com/mt-inside/go-grpc-bazel-example/pkg/client"
@@ -28,7 +30,10 @@ func main() {
 	log := common.NewLogger()
 
 	app.Action = func() {
-		c := client.NewClient(log, *address)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second) // will expire after 1 second. We pass this to the gRPC library, so it will give up if the request takes more than that.
+		defer cancel()                                                        // manually cancel the context (and this gRPC lib's operation) if we panic or otherwise return from this function
+
+		c := client.NewClient(ctx, log, *address)
 		defer c.Close()
 
 		fmt.Println(fmt.Sprintf("Greeting: %s", c.GetGreeting(*name)))
