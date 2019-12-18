@@ -34,5 +34,7 @@ func main() {
 		fmt.Println(fmt.Sprintf("Greeting: %s", c.GetGreeting(*name)))
 	}
 
-	app.Run(os.Args)
+	if err := app.Run(os.Args); err != nil {
+		log.Fatalf("could not start app: %v", err)
+	}
 }
