@@ -1,8 +1,18 @@
 package main
 
-import "github.com/mt-inside/go-grpc-bazel-example/pkg/server"
+import (
+	"github.com/mt-inside/go-grpc-bazel-example/pkg/common"
+	"github.com/mt-inside/go-grpc-bazel-example/pkg/server"
+	"go.uber.org/zap"
+)
+
+const (
+	port string = "50051"
+)
 
 func main() {
-	s := server.NewServer("50051")
+	log := common.NewLogger().With(zap.Namespace("server"), zap.String("port", port))
+
+	s := server.NewServer(log, port)
 	s.Listen()
 }

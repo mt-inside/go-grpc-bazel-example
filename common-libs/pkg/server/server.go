@@ -2,10 +2,10 @@ package server
 
 import (
 	"context"
-	"log"
 	"net"
 
 	pb "github.com/mt-inside/go-grpc-bazel-example/api"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -14,31 +14,32 @@ import (
 type Server struct {
 	pb.UnimplementedGreeterServer // defines "unimplemented" methods for all RPCs so that this code is forwards-compatible
 
+	log *zap.SugaredLogger
 	port string
 }
 
-func NewServer(port string) *Server {
-	return &Server{port: port}
+func NewServer(log *zap.SugaredLogger, port string) *Server {
+	return &Server{log: log, port: port}
 }
 
 func (s Server) Listen() {
 	sock, err := net.Listen("tcp", ":"+s.port)
 	if err != nil {
-		log.Fatalf("failed to lsiten: %v", err)
+		s.log.Fatalf("failed to listen: %v", err)
 	}
 
 	srv := grpc.NewServer()
 	pb.RegisterGreeterServer(srv, s)
 	reflection.Register(srv)
 
-	log.Printf("Listening on %v", s.port)
+	s.log.Infof("Listening...")
 	if err := srv.Serve(sock); err != nil {
-		log.Fatalf("failed to serve: %v", err)
+		s.log.Fatalf("failed to serve: %v", err)
 	}
 }
 
 func (s Server) SayHello(ctxt context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
-	log.Printf("Received: %v", in)
+	s.log.Infof("Received: %v", in)
 	return &pb.HelloReply{Message: generateReply(in.GetName())}, nil
 }
 

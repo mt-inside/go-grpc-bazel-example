@@ -5,4 +5,8 @@ go_library(
     srcs = ["common.go"],
     importpath = "github.com/mt-inside/go-grpc-bazel-example/pkg/common",
     visibility = ["//visibility:public"],
+    deps = [
+        "@com_github_mattn_go_isatty//:go_default_library",
+        "@org_uber_go_zap//:go_default_library",
+    ],
 )

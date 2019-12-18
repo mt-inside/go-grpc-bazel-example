@@ -2,7 +2,7 @@ package client
 
 import (
 	"context"
-	"log"
+	"go.uber.org/zap"
 	"time"
 
 	pb "github.com/mt-inside/go-grpc-bazel-example/api"
@@ -10,12 +10,13 @@ import (
 )
 
 type Client struct {
+	log *zap.SugaredLogger
 	address string
 	conn    *grpc.ClientConn
 	client  pb.GreeterClient
 }
 
-func NewClient(address string) *Client {
+func NewClient(log *zap.SugaredLogger, address string) *Client {
 	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		log.Fatalf("could not connect: %v", err)
@@ -23,7 +24,9 @@ func NewClient(address string) *Client {
 
 	client := pb.NewGreeterClient(conn)
 
-	return &Client{address, conn, client}
+	log.Debugf("Connected to %v", address)
+
+	return &Client{log, address, conn, client}
 }
 
 func (c Client) GetGreeting(name string) string {
@@ -32,8 +35,10 @@ func (c Client) GetGreeting(name string) string {
 
 	r, err := c.client.SayHello(ctx, &pb.HelloRequest{Name: name})
 	if err != nil {
-		log.Fatalf("could not get greeting: %v", err)
+		c.log.Fatalf("could not get greeting: %v", err)
 	}
+
+	c.log.Debugf("Made SayHello call for name: %v", name)
 
 	return r.GetMessage()
 }
@@ -41,9 +46,3 @@ func (c Client) GetGreeting(name string) string {
 func (c Client) Close() {
 	c.conn.Close()
 }
-
-// write up: optional args:
-// - nils
-// - variadic (if they're all the same type)
-// - params struct (if you don't specify some when making the struct they get the zero value. If that's not OK, have a new() func for the struct that supplies other defaults)
-// - functional options

@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"runtime"
 
@@ -26,11 +25,13 @@ func main() {
 		name = app.StringArg("NAME", "world", "Name to Greet")
 	)
 
+	log := common.NewLogger()
+
 	app.Action = func() {
-		c := client.NewClient(*address)
+		c := client.NewClient(log, *address)
 		defer c.Close()
 
-		log.Printf("Greeting: %s", c.GetGreeting(*name))
+		fmt.Println(fmt.Sprintf("Greeting: %s", c.GetGreeting(*name)))
 	}
 
 	app.Run(os.Args)
