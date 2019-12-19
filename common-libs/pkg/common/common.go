@@ -16,7 +16,8 @@ func NewLogger() *zap.SugaredLogger {
 	} else {
 		logger, _ = zap.NewProduction() // JSON-formatting, info level
 	}
-	defer logger.Sync() // flushes buffer, if any
+
+	logger.Debug("NewLogger")
 
 	return logger.Sugar()
 }

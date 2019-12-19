@@ -10,6 +10,10 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
+type ServerConfig struct {
+	Port string
+}
+
 // Used to implement helloworld.GreeterServer
 type Server struct {
 	pb.UnimplementedGreeterServer // defines "unimplemented" methods for all RPCs so that this code is forwards-compatible
@@ -18,8 +22,13 @@ type Server struct {
 	port string
 }
 
-func NewServer(log *zap.SugaredLogger, port string) *Server {
-	return &Server{log: log, port: port}
+func NewServer(log *zap.SugaredLogger, config *ServerConfig) *Server {
+	log.Debugf("NewServer")
+
+	return &Server{
+		log: log.With(zap.Namespace("server"), zap.String("port", config.Port)),
+		port: config.Port,
+	}
 }
 
 func (s Server) Listen() {

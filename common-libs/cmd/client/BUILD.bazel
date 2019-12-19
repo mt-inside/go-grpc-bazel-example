@@ -9,6 +9,8 @@ go_library(
         "//pkg/client:go_default_library",
         "//pkg/common:go_default_library",
         "@com_github_jawher_mow_cli//:go_default_library",
+        "@org_uber_go_fx//:go_default_library",
+        "@org_uber_go_zap//:go_default_library",
     ],
 )
 

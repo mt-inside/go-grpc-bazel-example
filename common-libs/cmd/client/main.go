@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
+	"go.uber.org/fx"
+	"go.uber.org/zap"
 	"os"
 	"runtime"
 	"time"
@@ -12,24 +14,28 @@ import (
 	"github.com/jawher/mow.cli"
 )
 
-const (
-	defaultName = "world"
-)
-
 func main() {
-	app := cli.App("client", "Get Greeted.")
-	app.Spec = "ADDRESS [NAME]"
-	app.Version("v version", fmt.Sprintf("client %v / %v", common.Version, runtime.Version()))
+	var log *zap.SugaredLogger
+
+	fxApp := fx.New(
+		fx.Provide(common.NewLogger),
+		fx.Populate(&log),
+	)
+
+	fxApp.Start(context.Background())
+	defer fxApp.Stop(context.Background())
+
+	mowApp := cli.App("client", "Get Greeted.")
+	mowApp.Spec = "ADDRESS [NAME]"
+	mowApp.Version("v version", fmt.Sprintf("client %v / %v", common.Version, runtime.Version()))
 
 	var (
 		// arg names must be supplied all-uppercase
-		address = app.StringArg("ADDRESS", "", "Address of the Greeter server; host:port")
-		name = app.StringArg("NAME", "world", "Name to Greet")
+		address = mowApp.StringArg("ADDRESS", "", "Address of the Greeter server; host:port")
+		name    = mowApp.StringArg("NAME", "world", "Name to Greet")
 	)
 
-	log := common.NewLogger()
-
-	app.Action = func() {
+	mowApp.Action = func() {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second) // will expire after 1 second. We pass this to the gRPC library, so it will give up if the request takes more than that.
 		defer cancel()                                                        // manually cancel the context (and this gRPC lib's operation) if we panic or otherwise return from this function
 
@@ -38,8 +44,7 @@ func main() {
 
 		fmt.Println(fmt.Sprintf("Greeting: %s", c.GetGreeting(*name)))
 	}
-
-	if err := app.Run(os.Args); err != nil {
-		log.Fatalf("could not start app: %v", err)
+	if err := mowApp.Run(os.Args); err != nil {
+		log.Fatalf("could not start mowApp: %v", err)
 	}
 }
