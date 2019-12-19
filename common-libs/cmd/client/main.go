@@ -1,3 +1,5 @@
+/* Tbh I think fx is unnecessary here and makes this overly complicated */
+
 package main
 
 import (
@@ -29,11 +31,9 @@ func main() {
 	mowApp.Spec = "ADDRESS [NAME]"
 	mowApp.Version("v version", fmt.Sprintf("client %v / %v", common.Version, runtime.Version()))
 
-	var (
-		// arg names must be supplied all-uppercase
-		address = mowApp.StringArg("ADDRESS", "", "Address of the Greeter server; host:port")
-		name    = mowApp.StringArg("NAME", "world", "Name to Greet")
-	)
+	// arg names must be supplied all-uppercase
+	address := mowApp.StringArg("ADDRESS", "", "Address of the Greeter server; host:port")
+	name    := mowApp.StringArg("NAME", "world", "Name to Greet")
 
 	mowApp.Action = func() {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second) // will expire after 1 second. We pass this to the gRPC library, so it will give up if the request takes more than that.
