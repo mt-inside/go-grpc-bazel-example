@@ -85,6 +85,29 @@ go_repository(
     version = "v0.3.2",
 )
 
+# == Docker ==
+
+# Load the rules' repo
+http_archive(
+    name = "io_bazel_rules_docker",
+    sha256 = "df13123c44b4a4ff2c2f337b906763879d94871d16411bf82dcfeba892b58607",
+    strip_prefix = "rules_docker-0.13.0",
+    urls = ["https://github.com/bazelbuild/rules_docker/releases/download/v0.13.0/rules_docker-v0.13.0.tar.gz"],
+)
+
+# From that repo, load these macros
+load("@io_bazel_rules_docker//repositories:repositories.bzl", container_repositories = "repositories")
+
+# And execute
+container_repositories() # ??
+
+# Now golang-specific stuff...
+# Load
+load("@io_bazel_rules_docker//go:image.bzl", _go_image_repos = "repositories")
+
+# Execute
+_go_image_repos()
+
 # == Gazelle auto-gen ==
 
 go_repository(

@@ -1,4 +1,6 @@
 load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+load("@io_bazel_rules_docker//container:container.bzl", "container_push")
+load("@io_bazel_rules_docker//go:image.bzl", "go_image")
 
 go_library(
     name = "go_default_library",
@@ -18,5 +20,15 @@ go_binary(
     name = "server",
     data = ["config/config.yaml"],
     embed = [":go_default_library"],
+    visibility = ["//visibility:public"],
+    # can't use goos and goarch in here, becuase of a long-standing bazel architectural problem
+)
+
+# `build` will make the tarball in the sandbox (won't, eg, load into local daemon)
+# `run` will (docker) load into the local daemon and run
+go_image(
+    name = "server_image",
+    binary = "server",
+    args = ["cmd/server/config/config.yaml"],
     visibility = ["//visibility:public"],
 )
