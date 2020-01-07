@@ -5,22 +5,23 @@ package main
 import (
 	"context"
 	"fmt"
-	"go.uber.org/fx"
-	"go.uber.org/zap"
 	"os"
 	"runtime"
 	"time"
 
-	"github.com/mt-inside/go-grpc-bazel-example/pkg/common"
+	cli "github.com/jawher/mow.cli" // this alias isn't necessary, but `go fmt` removes this import if it's not present
+	"go.uber.org/fx"
+	"go.uber.org/zap"
+
 	"github.com/mt-inside/go-grpc-bazel-example/pkg/client"
-	"github.com/jawher/mow.cli"
+	"github.com/mt-inside/go-grpc-bazel-example/pkg/common"
 )
 
 func main() {
 	var log *zap.SugaredLogger
 
 	fxApp := fx.New(
-		fx.Provide(common.NewLogger),
+		common.NewCommonModule(),
 		fx.Populate(&log),
 	)
 
@@ -33,7 +34,7 @@ func main() {
 
 	// arg names must be supplied all-uppercase
 	address := mowApp.StringArg("ADDRESS", "", "Address of the Greeter server; host:port")
-	name    := mowApp.StringArg("NAME", "world", "Name to Greet")
+	name := mowApp.StringArg("NAME", "world", "Name to Greet")
 
 	mowApp.Action = func() {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second) // will expire after 1 second. We pass this to the gRPC library, so it will give up if the request takes more than that.

@@ -1,12 +1,13 @@
 package main
 
 import (
+	"os"
+
 	"github.com/mt-inside/go-grpc-bazel-example/pkg/common"
 	"github.com/mt-inside/go-grpc-bazel-example/pkg/server"
 	"go.uber.org/config"
-	"go.uber.org/zap"
 	"go.uber.org/fx"
-	"os"
+	"go.uber.org/zap"
 )
 
 func NewConfig(log *zap.SugaredLogger) *server.ServerConfig {
@@ -31,7 +32,7 @@ func NewConfig(log *zap.SugaredLogger) *server.ServerConfig {
 	}
 
 	var c server.ServerConfig
-	if err := provider.Get("").Populate(&c);err != nil {
+	if err := provider.Get("").Populate(&c); err != nil {
 		log.Fatalf("cannot unmarshal config: %v", err)
 	}
 
@@ -48,7 +49,7 @@ func main() {
 		fx.Invoke(func(s *server.Server) {
 			s.Listen()
 		}),
-		)
+	)
 
 	app.Run()
 }

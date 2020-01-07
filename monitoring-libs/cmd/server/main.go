@@ -36,7 +36,7 @@ func NewConfig(log *zap.SugaredLogger) *server.ServerConfig {
 	}
 
 	var c server.ServerConfig
-	if err := provider.Get("").Populate(&c);err != nil {
+	if err := provider.Get("").Populate(&c); err != nil {
 		log.Fatalf("cannot unmarshal config: %v", err)
 	}
 
@@ -45,9 +45,9 @@ func NewConfig(log *zap.SugaredLogger) *server.ServerConfig {
 
 func main() {
 	app := fx.New(
+		common.NewCommonModule(),
 		fx.Provide(
 			NewConfig,
-			common.NewLogger,
 			server.NewServer,
 		),
 		fx.Invoke(func(s *server.Server) {
