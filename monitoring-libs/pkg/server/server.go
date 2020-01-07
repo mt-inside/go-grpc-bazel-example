@@ -4,6 +4,9 @@ import (
 	"context"
 	"net"
 
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
+
 	pb "github.com/mt-inside/go-grpc-bazel-example/api"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -11,23 +14,30 @@ import (
 )
 
 type ServerConfig struct {
-	Port string
+	Port     string
+	PromPort string
 }
 
 // Used to implement helloworld.GreeterServer
 type Server struct {
 	pb.UnimplementedGreeterServer // defines "unimplemented" methods for all RPCs so that this code is forwards-compatible
 
-	log *zap.SugaredLogger
-	port string
+	log       *zap.SugaredLogger
+	port      string
+	name_lens prometheus.Histogram
 }
 
 func NewServer(log *zap.SugaredLogger, config *ServerConfig) *Server {
 	log.Debugf("NewServer")
 
 	return &Server{
-		log: log.With(zap.Namespace("server"), zap.String("port", config.Port)),
+		log:  log.With(zap.Namespace("server"), zap.String("port", config.Port)),
 		port: config.Port,
+		name_lens: promauto.NewHistogram(prometheus.HistogramOpts{
+			Name:    "name_lengths",
+			Help:    "Lenghts of the names that have asked to be greeted",
+			Buckets: prometheus.LinearBuckets(0, 1, 10),
+		}),
 	}
 }
 
@@ -48,8 +58,11 @@ func (s Server) Listen() {
 }
 
 func (s Server) SayHello(ctxt context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
+	name := in.GetName()
+
 	s.log.Infof("Received: %v", in)
-	return &pb.HelloReply{Message: generateReply(in.GetName())}, nil
+	s.name_lens.Observe(float64(len(name)))
+	return &pb.HelloReply{Message: generateReply(name)}, nil
 }
 
 func generateReply(name string) string {

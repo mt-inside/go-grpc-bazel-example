@@ -1,12 +1,17 @@
 package main
 
 import (
+	"fmt"
+	"net/http"
+	"os"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"go.uber.org/config"
+	"go.uber.org/fx"
+	"go.uber.org/zap"
+
 	"github.com/mt-inside/go-grpc-bazel-example/pkg/common"
 	"github.com/mt-inside/go-grpc-bazel-example/pkg/server"
-	"go.uber.org/config"
-	"go.uber.org/zap"
-	"go.uber.org/fx"
-	"os"
 )
 
 func NewConfig(log *zap.SugaredLogger) *server.ServerConfig {
@@ -46,9 +51,16 @@ func main() {
 			server.NewServer,
 		),
 		fx.Invoke(func(s *server.Server) {
-			s.Listen()
+			go s.Listen()
 		}),
-		)
+		fx.Invoke(func(log *zap.SugaredLogger, config *server.ServerConfig) {
+			port := config.PromPort
+			log = log.With(zap.Namespace("prom"), zap.String("port", port))
+			http.Handle("/metrics", promhttp.Handler())
+			log.Infof("Listening for Prometheus scrapes")
+			go http.ListenAndServe(fmt.Sprintf(":%s", port), nil)
+		}),
+	)
 
 	app.Run()
 }
