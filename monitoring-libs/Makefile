@@ -25,3 +25,7 @@ local-image:
 
 local-image-run: local-image
 	docker run bazel/cmd/server:server_image
+
+local-stack-run: local-image
+	docker-compose -f deploy/local/docker-compose.yaml rm
+	docker-compose -f deploy/local/docker-compose.yaml up
