@@ -47,7 +47,7 @@ func main() {
 			server.NewServer,
 		),
 		fx.Invoke(func(s *server.Server) {
-			s.Listen()
+			go s.Listen()
 		}),
 	)
 
