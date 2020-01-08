@@ -41,9 +41,9 @@ func NewConfig(log *zap.SugaredLogger) *server.ServerConfig {
 
 func main() {
 	app := fx.New(
+		common.NewCommonModule(),
 		fx.Provide(
 			NewConfig,
-			common.NewLogger,
 			server.NewServer,
 		),
 		fx.Invoke(func(s *server.Server) {

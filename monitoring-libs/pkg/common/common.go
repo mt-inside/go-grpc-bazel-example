@@ -28,5 +28,4 @@ func NewCommonModule() fx.Option {
 		}),
 		fx.Logger(zapgrpc.NewLogger(logger)),
 	)
-
 }
