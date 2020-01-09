@@ -4,10 +4,8 @@
 %:
 	@true
 
-gazelle-force:
-	bazel run //:gazelle -- update-repos -from_file=go.mod
-
 build:
+	bazel run //:gazelle -- update-repos -prune=true -from_file=go.mod -to_macro=go_repos.bzl%go_repositories
 	bazel run //:gazelle
 	bazel build //...
 
