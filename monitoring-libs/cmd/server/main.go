@@ -46,13 +46,10 @@ func NewConfig(log *zap.SugaredLogger) *server.ServerConfig {
 func main() {
 	app := fx.New(
 		common.NewCommonModule(),
+		server.NewServerModule(),
 		fx.Provide(
 			NewConfig,
-			server.NewServer,
 		),
-		fx.Invoke(func(s *server.Server) {
-			go s.Listen()
-		}),
 		fx.Invoke(func(log *zap.SugaredLogger, config *server.ServerConfig) {
 			port := config.PromPort
 			log = log.With(zap.Namespace("prom"), zap.String("port", port))

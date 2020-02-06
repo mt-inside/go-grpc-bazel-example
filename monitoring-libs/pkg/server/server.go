@@ -2,37 +2,28 @@ package server
 
 import (
 	"context"
-	"net"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 
 	pb "github.com/mt-inside/go-grpc-bazel-example/api"
+	"go.uber.org/fx"
 	"go.uber.org/zap"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 )
 
-type ServerConfig struct {
-	Port     string
-	PromPort string
-}
-
 // Used to implement helloworld.GreeterServer
-type Server struct {
+type GreeterServer struct {
 	pb.UnimplementedGreeterServer // defines "unimplemented" methods for all RPCs so that this code is forwards-compatible
 
 	log       *zap.SugaredLogger
-	port      string
 	name_lens prometheus.Histogram
 }
 
-func NewServer(log *zap.SugaredLogger, config *ServerConfig) *Server {
-	log.Debugf("NewServer")
+func NewGreeterServer(log *zap.SugaredLogger, config *ServerConfig) *GreeterServer {
+	log.Debugf("NewGreeterServer")
 
-	return &Server{
-		log:  log.With(zap.Namespace("server"), zap.String("port", config.Port)),
-		port: config.Port,
+	return &GreeterServer{
+		log: log.With(zap.Namespace("greeter server")),
 		name_lens: promauto.NewHistogram(prometheus.HistogramOpts{
 			Name:    "name_lengths",
 			Help:    "Lenghts of the names that have asked to be greeted",
@@ -41,23 +32,7 @@ func NewServer(log *zap.SugaredLogger, config *ServerConfig) *Server {
 	}
 }
 
-func (s Server) Listen() {
-	sock, err := net.Listen("tcp", ":"+s.port)
-	if err != nil {
-		s.log.Fatalf("failed to listen: %v", err)
-	}
-
-	srv := grpc.NewServer()
-	pb.RegisterGreeterServer(srv, s)
-	reflection.Register(srv)
-
-	s.log.Infof("Listening...")
-	if err := srv.Serve(sock); err != nil {
-		s.log.Fatalf("failed to serve: %v", err)
-	}
-}
-
-func (s Server) SayHello(ctxt context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
+func (s GreeterServer) SayHello(ctxt context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
 	name := in.GetName()
 
 	s.log.Infof("Received: %v", in)
@@ -67,4 +42,15 @@ func (s Server) SayHello(ctxt context.Context, in *pb.HelloRequest) (*pb.HelloRe
 
 func generateReply(name string) string {
 	return "Hello " + name
+}
+
+func NewGreeterServerModule() fx.Option {
+	return fx.Options(
+		fx.Provide(NewGreeterServer),
+		/* Problem is that we want to use a struct as an iface, and because of duck-typing we have to be explicit about the tie-up.
+		* Is there a built-in way to do this? ie to provide a ctor for a named iface?
+		* If not, it could be a bit neater to pass a func to Invoke which takes *grpc.Server and the struct type, and just call Register*Server() on them */
+		fx.Provide(func(gs *GreeterServer) pb.GreeterServer { return gs }),
+		fx.Invoke(pb.RegisterGreeterServer),
+	)
 }
