@@ -3,6 +3,7 @@ module github.com/mt-inside/go-grpc-bazel-example
 go 1.13
 
 require (
+	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0
 	github.com/jawher/mow.cli v1.1.0
 	github.com/mattn/go-isatty v0.0.11
 	github.com/prometheus/client_golang v1.2.1

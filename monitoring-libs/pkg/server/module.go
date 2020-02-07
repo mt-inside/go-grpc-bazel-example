@@ -4,6 +4,8 @@ import (
 	"context"
 	"net"
 
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -18,7 +20,14 @@ type ServerConfig struct {
 func NewGrpcServer(log *zap.SugaredLogger) (*grpc.Server, error) {
 	log.Debugf("NewGrpcServer")
 
-	srv := grpc.NewServer() // TODO: options
+	srv := grpc.NewServer(
+		// TODO: make this configurable
+		grpc.UnaryInterceptor(
+			grpc_middleware.ChainUnaryServer(
+				grpc_zap.UnaryServerInterceptor(log.Desugar()),
+			),
+		),
+	)
 	reflection.Register(srv)
 	return srv, nil
 }
