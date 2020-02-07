@@ -1,4 +1,4 @@
-.PHONY: gazelle-force build run test
+.PHONY: build test run-server run-client local-image local-image-run local-stack-run
 .DEFAULT_GOAL := build
 
 %:
