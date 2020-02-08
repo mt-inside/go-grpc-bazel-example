@@ -35,7 +35,7 @@ http_archive(
 )
 
 # From that repo, load these macros
-load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies", "go_repository")  # we need go_repository later, and it's in here because it uses gazelle to generate bazel build files for the code in the repos.
+load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies", "go_repository")  # we need go_repository later, and it's in here because it uses gazelle to generate bazel build files for the code in the repos. Ie go_repository is git_repository plus gazelle adding BUILD files for repos that don't come with them.
 
 gazelle_dependencies()  # Deps for the gazelle rules
 
@@ -59,7 +59,7 @@ git_repository(
 load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
 
 protobuf_deps()  # Deps for the protobuf compilation rules
-# - NB: this ^^ is just the deps. There isn't an "execution" step because we don't install a toolchain or anything, there's just rules (and their deps) available to load and run from BUILD files.
+# - NB: this ^^ is just the deps. There isn't an "execution" step because we don't install a toolchain or anything (I think gRPC does that?), there's just rules (and their deps) available to load and run from BUILD files.
 
 # == gRPC ==
 
