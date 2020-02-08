@@ -1,6 +1,8 @@
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar", "pkg_deb")
 load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
-load("@io_bazel_rules_docker//container:container.bzl", "container_push")
 load("@io_bazel_rules_docker//go:image.bzl", "go_image")
+load("@io_bazel_rules_docker//container:container.bzl", "container_image", "container_push")
 
 go_library(
     name = "go_default_library",
@@ -28,8 +30,38 @@ go_binary(
 # `build` will make the tarball in the sandbox (won't, eg, load into local daemon)
 # `run` will (docker) load into the local daemon and run
 go_image(
-    name = "server_image",
-    binary = "server",
+    name = "app_image",
+    binary = ":server",
     args = ["cmd/server/config/config.yaml"],
     visibility = ["//visibility:public"],
+)
+
+# causes an internal bazel crash
+# http_file(
+#     name = "probe",
+#     urls = ["https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/v0.3.1/grpc_health_probe-linux-amd64"],
+#     sha256 = "bfbe82e34645e91cdf3bacbb0d2dc7786f3c3cc4da6b64a446e5fdfb7bb0429f",
+# )
+
+pkg_tar(
+    name = "grpc-probe",
+    strip_prefix = ".",
+    package_dir = "/bin",
+    #files = [":probe"],
+    srcs = [":grpc_health_probe"],  # local
+    mode = "0755",
+)
+
+container_image(
+    name = "image",
+    base = ":app_image",
+    tars = [":grpc-probe"],
+)
+
+container_push(
+    name = "push",
+    image = ":image",
+    format = "Docker",
+    registry = "docker.io",
+    repository = "mtinside/go-grpc-bazel-example-server",
 )
