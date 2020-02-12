@@ -1,6 +1,6 @@
 # ? Code to get repos of bazel macros and commands, over http and git
 # ? Loaded from a built-in repository
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 # == Golang ==
@@ -113,3 +113,10 @@ load("@io_bazel_rules_docker//go:image.bzl", _go_image_repos = "repositories")
 
 # Execute
 _go_image_repos()
+
+
+http_file(
+    name = "probe",
+    urls = ["https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/v0.3.1/grpc_health_probe-linux-amd64"],
+    sha256 = "bfbe82e34645e91cdf3bacbb0d2dc7786f3c3cc4da6b64a446e5fdfb7bb0429f",
+)

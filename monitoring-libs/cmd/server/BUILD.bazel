@@ -1,5 +1,4 @@
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
-load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar", "pkg_deb")
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
 load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
 load("@io_bazel_rules_docker//go:image.bzl", "go_image")
 load("@io_bazel_rules_docker//container:container.bzl", "container_image", "container_push")
@@ -37,18 +36,12 @@ go_image(
 )
 
 # causes an internal bazel crash
-# http_file(
-#     name = "probe",
-#     urls = ["https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/v0.3.1/grpc_health_probe-linux-amd64"],
-#     sha256 = "bfbe82e34645e91cdf3bacbb0d2dc7786f3c3cc4da6b64a446e5fdfb7bb0429f",
-# )
 
 pkg_tar(
     name = "grpc-probe",
     strip_prefix = ".",
     package_dir = "/bin",
-    #files = [":probe"],
-    srcs = [":grpc_health_probe"],  # local
+    srcs = ["@probe//file"],
     mode = "0755",
 )
 
