@@ -114,7 +114,6 @@ load("@io_bazel_rules_docker//go:image.bzl", _go_image_repos = "repositories")
 # Execute
 _go_image_repos()
 
-
 http_file(
     name = "probe",
     urls = ["https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/v0.3.1/grpc_health_probe-linux-amd64"],
