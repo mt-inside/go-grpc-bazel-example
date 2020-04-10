@@ -2,16 +2,16 @@ package main
 
 import (
 	"os"
+	"runtime"
 
 	"github.com/mt-inside/go-grpc-bazel-example/pkg/common"
 	"github.com/mt-inside/go-grpc-bazel-example/pkg/server"
 	"go.uber.org/config"
-	"go.uber.org/fx"
-	"go.uber.org/zap"
 )
 
-func NewConfig(log *zap.SugaredLogger) *server.ServerConfig {
-	log.Debugf("NewConfig")
+func main() {
+	log := common.NewLogger()
+	log.Debug(runtime.Version())
 
 	var cfgPath string
 	if len(os.Args) > 1 {
@@ -31,25 +31,11 @@ func NewConfig(log *zap.SugaredLogger) *server.ServerConfig {
 		log.Fatalf("cannot read config: %v", err)
 	}
 
-	var c server.ServerConfig
-	if err := provider.Get("").Populate(&c); err != nil {
+	c := new(server.ServerConfig)
+	if err := provider.Get("").Populate(c); err != nil {
 		log.Fatalf("cannot unmarshal config: %v", err)
 	}
 
-	return &c
-}
-
-func main() {
-	app := fx.New(
-		common.NewCommonModule(),
-		fx.Provide(
-			NewConfig,
-			server.NewServer,
-		),
-		fx.Invoke(func(s *server.Server) {
-			go s.Listen()
-		}),
-	)
-
-	app.Run()
+	s := server.NewServer(log, c)
+	s.Listen()
 }

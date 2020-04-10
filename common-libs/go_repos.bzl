@@ -379,24 +379,7 @@ def go_repositories():
         sum = "h1:upnMPpMm6WlbZtXoasNkK4f0FhxwS+W4Iqz5oNznehQ=",
         version = "v1.4.0",
     )
-    go_repository(
-        name = "org_uber_go_dig",
-        importpath = "go.uber.org/dig",
-        sum = "h1:1rR6hnL/bu1EVcjnRDN5kx1vbIjEJDTGhSQ2B3ddpcI=",
-        version = "v1.8.0",
-    )
-    go_repository(
-        name = "org_uber_go_fx",
-        importpath = "go.uber.org/fx",
-        sum = "h1:S2K/H8oNied0Je/mLKdWzEWKZfv9jtxSDm8CnwK+5Fg=",
-        version = "v1.10.0",
-    )
-    go_repository(
-        name = "org_uber_go_goleak",
-        importpath = "go.uber.org/goleak",
-        sum = "h1:G3eWbSNIskeRqtsN/1uI5B+eP73y3JUuBsv9AZjehb4=",
-        version = "v0.10.0",
-    )
+
     go_repository(
         name = "org_uber_go_multierr",
         importpath = "go.uber.org/multierr",

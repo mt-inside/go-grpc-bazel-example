@@ -4,14 +4,12 @@ import (
 	"os"
 
 	"github.com/mattn/go-isatty"
-	"go.uber.org/fx"
 	"go.uber.org/zap"
-	"go.uber.org/zap/zapgrpc"
 )
 
 const Version = "0.0.1"
 
-func NewCommonModule() fx.Option {
+func NewLogger() *zap.SugaredLogger {
 	var logger *zap.Logger
 	if isatty.IsTerminal(os.Stderr.Fd()) {
 		// New*() are shortcuts that provide pre-defined sets of config.
@@ -20,12 +18,5 @@ func NewCommonModule() fx.Option {
 		logger, _ = zap.NewProduction() // JSON-formatting, info level
 	}
 
-	return fx.Options(
-		fx.Provide(func() *zap.SugaredLogger {
-			logger.Debug("NewLogger")
-			return logger.Sugar()
-
-		}),
-		fx.Logger(zapgrpc.NewLogger(logger)),
-	)
+	return logger.Sugar()
 }
