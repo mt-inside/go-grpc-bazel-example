@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+
 	"go.uber.org/zap"
 
 	pb "github.com/mt-inside/go-grpc-bazel-example/api"
@@ -9,8 +10,8 @@ import (
 )
 
 type Client struct {
-	ctx context.Context
-	log *zap.SugaredLogger
+	ctx     context.Context
+	log     *zap.SugaredLogger
 	address string
 	conn    *grpc.ClientConn
 	client  pb.GreeterClient
@@ -26,7 +27,7 @@ func NewClient(ctx context.Context, log *zap.SugaredLogger, address string) *Cli
 
 	client := pb.NewGreeterClient(conn)
 
-	log.Debugf("Connected to %v", address)
+	log.Infof("Connected to %v", address)
 
 	return &Client{ctx, log, address, conn, client}
 }

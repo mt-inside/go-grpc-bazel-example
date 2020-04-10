@@ -1,21 +1,18 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
 	"os"
+	"runtime"
 
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/config"
-	"go.uber.org/fx"
-	"go.uber.org/zap"
 
 	"github.com/mt-inside/go-grpc-bazel-example/pkg/common"
 	"github.com/mt-inside/go-grpc-bazel-example/pkg/server"
 )
 
-func NewConfig(log *zap.SugaredLogger) *server.ServerConfig {
-	log.Debugf("NewConfig")
+func main() {
+	log := common.NewLogger()
+	log.Debug(runtime.Version())
 
 	var cfgPath string
 	if len(os.Args) > 1 {
@@ -35,29 +32,11 @@ func NewConfig(log *zap.SugaredLogger) *server.ServerConfig {
 		log.Fatalf("cannot read config: %v", err)
 	}
 
-	var c server.ServerConfig
+	c := new(server.ServerConfig)
 	if err := provider.Get("").Populate(&c); err != nil {
 		log.Fatalf("cannot unmarshal config: %v", err)
 	}
 
-	return &c
-}
-
-func main() {
-	app := fx.New(
-		common.NewCommonModule(),
-		server.NewServerModule(),
-		fx.Provide(
-			NewConfig,
-		),
-		fx.Invoke(func(log *zap.SugaredLogger, config *server.ServerConfig) {
-			port := config.PromPort
-			log = log.With(zap.Namespace("prom"), zap.String("port", port))
-			http.Handle("/metrics", promhttp.Handler())
-			log.Infof("Listening for Prometheus scrapes")
-			go http.ListenAndServe(fmt.Sprintf(":%s", port), nil)
-		}),
-	)
-
-	app.Run()
+	s := server.NewServer(log, c)
+	s.Listen()
 }

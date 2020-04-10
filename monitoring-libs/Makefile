@@ -16,7 +16,7 @@ test: gazelle
 run-server: gazelle
 	bazel run //cmd/server "cmd/server/config/config.yaml"
 run-client: gazelle
-	bazel run //cmd/client -- localhost:50051
+	bazel run //cmd/client -- localhost:50051 $(filter-out $@, $(MAKECMDGOALS))
 
 image:
 	bazel build $(LINUX) //cmd/server:image.tar
