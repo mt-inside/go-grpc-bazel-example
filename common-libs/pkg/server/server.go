@@ -37,7 +37,7 @@ func (s Server) Listen() {
 		s.log.Fatalf("failed to listen: %v", err)
 	}
 
-	// TODO: split class into GreeterServer and GrpcServer, then fix up New*
+	// TODO: split class into GreeterServer and GrpcServer, then fix up New* (see monitoring-libs)
 	srv := grpc.NewServer()
 	pb.RegisterGreeterServer(srv, s)
 	reflection.Register(srv)
