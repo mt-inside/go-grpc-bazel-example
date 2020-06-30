@@ -14,5 +14,9 @@ And
 
 * Metrics with [Prometheus](https://prometheus.io/) ([This example](https://godoc.org/github.com/prometheus/client_golang/prometheus/promauto))
 
+Using
+
+* Dependancy Injection with [fx](https://github.com/uber-go/fx)
+
 Notes
 Container image contains the gRPC health check probe, run with: `docker exec -ti <container id> /bin/grpc_health_probe-linux-amd64 -addr localhost:50051`

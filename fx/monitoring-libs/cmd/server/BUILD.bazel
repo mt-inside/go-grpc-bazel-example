@@ -1,0 +1,59 @@
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+load("@io_bazel_rules_docker//go:image.bzl", "go_image")
+load("@io_bazel_rules_docker//container:container.bzl", "container_image", "container_push")
+
+go_library(
+    name = "go_default_library",
+    srcs = ["main.go"],
+    importpath = "github.com/mt-inside/go-grpc-bazel-example/cmd/server",
+    visibility = ["//visibility:private"],
+    deps = [
+        "//pkg/common:go_default_library",
+        "//pkg/server:go_default_library",
+        "@com_github_prometheus_client_golang//prometheus/promhttp:go_default_library",
+        "@org_uber_go_config//:go_default_library",
+        "@org_uber_go_fx//:go_default_library",
+        "@org_uber_go_zap//:go_default_library",
+    ],
+)
+
+go_binary(
+    name = "server",
+    data = ["config/config.yaml"],
+    embed = [":go_default_library"],
+    visibility = ["//visibility:public"],
+)
+
+# `build` will make the tarball in the sandbox (won't, eg, load into local daemon)
+# `run` will (docker) load into the local daemon and run
+go_image(
+    name = "app_image",
+    binary = ":server",
+    args = ["cmd/server/config/config.yaml"],
+    visibility = ["//visibility:public"],
+)
+
+# causes an internal bazel crash
+
+pkg_tar(
+    name = "grpc-probe",
+    strip_prefix = ".",
+    package_dir = "/bin",
+    srcs = ["@probe//file"],
+    mode = "0755",
+)
+
+container_image(
+    name = "image",
+    base = ":app_image",
+    tars = [":grpc-probe"],
+)
+
+container_push(
+    name = "push",
+    image = ":image",
+    format = "Docker",
+    registry = "docker.io",
+    repository = "mtinside/go-grpc-bazel-example-server",
+)

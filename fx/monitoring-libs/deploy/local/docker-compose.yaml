@@ -1,0 +1,28 @@
+version: "3.7"
+networks:
+  main:
+services:
+  server:
+    image: bazel/cmd/server:server_image
+    networks:
+      - main
+    ports:
+      - "50051:50051"
+    restart: "no"
+  prometheus:
+    image: quay.io/prometheus/prometheus:v2.15.0
+    networks:
+      - main
+    volumes:
+      - "../config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro"
+    restart: unless-stopped
+  grafana:
+    image: docker.io/grafana/grafana:6.5.2
+    networks:
+      - main
+    volumes:
+      - "../config/grafana:/etc/grafana:ro"
+    ports:
+      - "8080:3000"
+    restart: unless-stopped
+
