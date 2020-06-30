@@ -14,4 +14,4 @@ test: gazelle
 run-server: gazelle
 	bazel run //cmd/server
 run-client: gazelle
-	bazel run //cmd/client -- $(filter-out $@, $(MAKECMDGOALS))
+	bazel run //cmd/client -- localhost:50051 $(filter-out $@, $(MAKECMDGOALS))
