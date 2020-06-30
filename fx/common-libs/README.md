@@ -9,3 +9,7 @@ And
 * Cmd-line parsing with [mow.cli](https://github.com/jawher/mow.cli)
 * Config-file parsing with [uber config](https://github.com/uber-go/config)
 * Logging with [uber zap](https://github.com/uber-go/zap)
+
+Using
+
+* Dependancy Injection with [uber fx](https://github.com/uber-go/fx)
