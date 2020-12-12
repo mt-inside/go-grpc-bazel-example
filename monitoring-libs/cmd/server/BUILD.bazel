@@ -27,8 +27,8 @@ go_binary(
 # `run` will (docker) load into the local daemon and run
 go_image(
     name = "app_image",
-    binary = ":server",
     args = ["cmd/server/config/config.yaml"],
+    binary = ":server",
     visibility = ["//visibility:public"],
 )
 
@@ -36,10 +36,10 @@ go_image(
 
 pkg_tar(
     name = "grpc-probe",
-    strip_prefix = ".",
-    package_dir = "/bin",
     srcs = ["@probe//file"],
     mode = "0755",
+    package_dir = "/bin",
+    strip_prefix = ".",
 )
 
 container_image(
@@ -50,8 +50,8 @@ container_image(
 
 container_push(
     name = "push",
-    image = ":image",
     format = "Docker",
+    image = ":image",
     registry = "docker.io",
     repository = "mtinside/go-grpc-bazel-example-server",
 )
